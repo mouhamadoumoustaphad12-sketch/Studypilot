@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StudyPilot — Planificateur d’études</title>
+<style>
+:root{--ink:#172033;--muted:#64748b;--line:#e2e8f0;--paper:#f6f8fc;--blue:#315ee8;--blue2:#eaf0ff}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:#fff;border-bottom:1px solid var(--line);padding:22px 18px}.wrap{max-width:1050px;margin:auto}.brand{display:flex;align-items:center;gap:12px}.logo{width:44px;height:44px;border-radius:13px;background:var(--blue);color:white;display:grid;place-items:center;font-size:24px;font-weight:800}h1{font-size:clamp(23px,4vw,32px);margin:0}header p{color:var(--muted);margin:5px 0 0}
+main{max-width:1050px;margin:22px auto;padding:0 14px 40px;display:grid;gap:16px}.card{background:#fff;border:1px solid var(--line);border-radius:17px;padding:18px;box-shadow:0 3px 14px #14244a08}h2{font-size:20px;margin:0 0 5px}.help{color:var(--muted);font-size:14px;margin:0 0 16px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+label{display:block;font-weight:650;font-size:14px;margin-bottom:6px}input,select,button{font:inherit}input,select{width:100%;padding:10px 11px;border:1px solid #cbd5e1;border-radius:9px;background:white;color:var(--ink);min-width:0}input:focus,select:focus{outline:3px solid #315ee82a;border-color:var(--blue)}.row{display:flex;gap:10px;align-items:end}.row>*{flex:1}.field{min-width:0}
+button{border:0;border-radius:10px;padding:11px 14px;font-weight:700;cursor:pointer}.primary{background:var(--blue);color:#fff}.secondary{background:var(--blue2);color:#2447b9}.ghost{background:#f1f5f9;color:#334155}.danger{background:#fff1f2;color:#9f1239;padding:8px 10px}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}
+.subject-list,.class-list{display:grid;gap:10px}.subject-item,.class-item{border:1px solid var(--line);border-radius:12px;padding:12px}.subject-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}.subject-head strong{overflow-wrap:anywhere}.subject-fields{display:grid;grid-template-columns:1.2fr .8fr 1fr .8fr;gap:9px}.subject-fields label,.class-fields label{font-size:12px}.class-fields{display:grid;grid-template-columns:1fr .8fr .8fr .8fr;gap:9px}
+.day-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.day{border:1px solid var(--line);border-radius:12px;padding:12px}.day h3{margin:0 0 9px;font-size:15px}.day-times{display:grid;grid-template-columns:1fr 1fr;gap:8px}.day-times label{font-size:12px}.notice{background:#fefce8;border:1px solid #fde68a;color:#854d0e;padding:11px 13px;border-radius:10px;font-size:14px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0}.stat{background:#f8fafc;border:1px solid var(--line);padding:12px;border-radius:12px}.stat strong{display:block;font-size:23px}.stat span{font-size:12px;color:var(--muted)}.tabs{display:flex;gap:8px;margin:12px 0;flex-wrap:wrap}.tab{background:#f1f5f9;color:#334155}.tab.active{background:var(--blue);color:#fff}
+.day-plan{border:1px solid var(--line);border-radius:12px;margin:10px 0;overflow:hidden}.day-title{padding:10px 13px;background:#f8fafc;font-weight:800;display:flex;justify-content:space-between;gap:8px}.session{display:grid;grid-template-columns:95px 1fr auto;gap:10px;align-items:center;padding:11px 13px;border-top:1px solid var(--line)}.session time{font-weight:750;color:#315ee8;font-size:14px}.session small{display:block;color:var(--muted);margin-top:2px}.session.done{opacity:.58;background:#f8fafc}.session.done .task-name{text-decoration:line-through}.check{width:19px;height:19px;accent-color:var(--blue)}.empty{color:var(--muted);text-align:center;padding:25px 10px}footer{text-align:center;color:var(--muted);font-size:12px;padding:15px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.subject-fields{grid-template-columns:1fr 1fr}.class-fields{grid-template-columns:1fr 1fr}.day-grid{grid-template-columns:1fr}.session{grid-template-columns:76px 1fr auto;padding:10px}.stats{grid-template-columns:repeat(3,minmax(0,1fr))}.stat strong{font-size:20px}}
+@media(max-width:380px){.subject-fields,.class-fields{grid-template-columns:1fr}.stats{grid-template-columns:1fr}.row{flex-direction:column;align-items:stretch}}
+</style>
+<style>
+/* StudyPilot v2 — professional app shell */
+:root{
+  --ink:#172033;--muted:#64748b;--line:#e2e8f0;--paper:#f4f7fb;
+  --blue:#315ee8;--blue2:#eaf0ff;--nav:#0f172a;
+}
+body{background:linear-gradient(180deg,#f8faff 0,#f4f7fb 260px);padding-bottom:20px}
+header{
+  position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:14px 18px;
+}
+header .wrap{max-width:1120px}
+.brand{justify-content:space-between}
+.brand-main{display:flex;align-items:center;gap:12px}
+.logo{width:46px;height:46px;border-radius:14px;box-shadow:0 8px 20px #315ee82e}
+.brand-badge{display:inline-flex;align-items:center;margin-left:8px;padding:3px 8px;border-radius:999px;background:#eef2ff;color:#315ee8;font-size:11px;font-weight:800}
+.topnav{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.topnav a{color:#475569;text-decoration:none;font-size:13px;font-weight:700;padding:8px 10px;border-radius:9px}
+.topnav a:hover{background:#f1f5f9;color:#315ee8}
+main{max-width:1120px;margin:24px auto;padding:0 14px 44px;gap:18px}
+.card{border-radius:18px;padding:20px;box-shadow:0 8px 28px rgba(15,23,42,.06)}
+.card h2{font-size:19px;letter-spacing:-.01em}
+.section-kicker{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:#315ee8;font-weight:850;margin-bottom:4px}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.card-head .icon{width:38px;height:38px;border-radius:11px;background:#eef2ff;display:grid;place-items:center;font-size:18px}
+.stats .stat{background:linear-gradient(180deg,#fff,#f8fafc);box-shadow:0 4px 12px rgba(15,23,42,.04)}
+.stats .stat strong{color:#0f172a}
+.tabs{background:#f1f5f9;padding:4px;border-radius:12px;width:max-content}
+.tab{border-radius:9px}
+.primary{box-shadow:0 6px 14px #315ee82e}
+button{transition:transform .12s ease,box-shadow .12s ease}
+button:hover{transform:translateY(-1px)}
+.notice{box-shadow:0 4px 14px rgba(15,23,42,.04)}
+footer{padding:10px}
+@media(max-width:700px){
+  header{position:relative}
+  .brand{display:block}
+  .topnav{overflow-x:auto;flex-wrap:nowrap;padding-bottom:2px}
+  .topnav a{white-space:nowrap}
+  main{margin-top:14px}
+}
+</style>
+<style>
+.progress-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px}.progress-card{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}.progress-card strong{font-size:26px;display:block}.progress-card span{color:var(--muted);font-size:13px}.progress-bar{height:11px;background:#e8edf5;border-radius:999px;overflow:hidden;margin:8px 0 4px}.progress-fill{height:100%;background:var(--blue);border-radius:999px;transition:width .25s ease}.subject-progress{display:grid;gap:10px;margin-top:14px}.subject-progress-row{display:grid;grid-template-columns:150px 1fr 70px;gap:10px;align-items:center}.subject-progress-row .name{font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.progress-note{color:var(--muted);font-size:13px;margin-top:10px}@media(max-width:700px){.progress-grid{grid-template-columns:1fr}.subject-progress-row{grid-template-columns:110px 1fr 55px;font-size:13px}}
+</style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#315ee8">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="icon" href="icon-192.png">
+</head>
+<body>
+<header>
+  <div class="wrap brand">
+    <div class="brand-main">
+      <div class="logo">S</div>
+      <div>
+        <h1>StudyPilot <span class="brand-badge">PROTOTYPE</span></h1>
+        <p>Ton planning d’études, organisé selon ta vraie semaine.</p>
+      </div>
+    </div>
+    <nav class="topnav" aria-label="Navigation">
+      <a href="#subjects">📚 Matières</a>
+      <a href="#availability">⏱️ Disponibilités</a>
+      <a href="#classes">🗓️ Cours</a>
+      <a href="#generator">⚡ Générer</a>
+      <a href="#results">📊 Planning</a><a href="#progress">📈 Progression</a>
+    </nav>
+  </div>
+</header>
+
+<div class="notice" id="installHint" style="margin:14px auto 0;max-width:1120px">
+  📱 <strong>StudyPilot peut être installé comme une application.</strong>
+  Sur Chrome, ouvre le menu ⋮ puis choisis <strong>Installer StudyPilot</strong> lorsque l'option apparaît.
+</div>
+<main>
+<section class="card" id="subjects"><div class="card-head"><div><div class="section-kicker">Étape 1</div><h2>📚 Tes matières</h2></div><div class="icon">📚</div></div><p class="help">Ajoute les matières à réviser. Une difficulté élevée et un examen proche donnent plus de priorité.</p><div id="subjects" class="subject-list"></div><div class="actions"><button class="secondary" id="addSubject">+ Ajouter une matière</button></div></section>
+<section class="card" id="availability"><div class="card-head"><div><div class="section-kicker">Étape 2</div><h2>⏱️ Tes disponibilités</h2></div><div class="icon">⏱️</div></div><p class="help">Indique quand tu peux étudier. Désactive les jours où tu n’es pas disponible. Les cours fixes seront exclus automatiquement.</p><div id="availability" class="day-grid"></div></section>
+<section class="card" id="classes"><div class="card-head"><div><div class="section-kicker">Étape 3</div><h2>🗓️ Tes cours et engagements</h2></div><div class="icon">🗓️</div></div><p class="help">Ajoute les cours, le travail ou toute activité qui ne doit pas être remplacée par une révision.</p><div id="classes" class="class-list"></div><div class="actions"><button class="secondary" id="addClass">+ Ajouter un cours / engagement</button></div></section>
+<section class="card" id="generator"><div class="card-head"><div><div class="section-kicker">Étape 4</div><h2>⚡ Générer ton planning</h2></div><div class="icon">⚡</div></div><p class="help">Le programme répartit les séances en tenant compte de tes disponibilités et de tes cours.</p><div class="grid"><div class="field"><label for="minutes">Durée d’une séance</label><select id="minutes"><option value="30">30 min + pause</option><option value="45" selected>45 min + pause de 15 min</option><option value="60">60 min + pause de 15 min</option></select></div><div class="field"><label for="maxSessions">Maximum de séances par jour</label><select id="maxSessions"><option value="2">2 séances</option><option value="3" selected>3 séances</option><option value="4">4 séances</option><option value="5">5 séances</option></select></div></div><div class="actions"><button class="primary" id="generate">Générer mon planning</button><button class="ghost" id="save">Sauvegarder mes réglages</button><button class="ghost" id="reset">Réinitialiser</button></div><p id="message" class="help" aria-live="polite" style="margin:12px 0 0"></p></section>
+<section class="card" id="results"><div class="card-head"><div><div class="section-kicker">Résultat</div><h2>📊 Ton planning</h2></div><div class="icon">📊</div></div><p class="help">Consulte une journée ou toute la semaine, puis coche les séances terminées.</p><div class="stats"><div class="stat"><strong id="statSessions">0</strong><span>séances prévues</span></div><div class="stat"><strong id="statHours">0 h</strong><span>de travail planifié</span></div><div class="stat"><strong id="statDone">0</strong><span>séances terminées</span></div></div><div class="tabs"><button class="tab active" data-view="week">Semaine</button><button class="tab" data-view="day">Premier jour</button></div><div id="plan"><div class="empty">Ton planning apparaîtra ici. Remplis les sections ci-dessus puis clique sur « Générer mon planning ».</div></div></section>
+<section class="card" id="progress"><div class="card-head"><div><div class="section-kicker">Suivi</div><h2>📈 Ma progression</h2></div><div class="icon">📈</div></div><p class="help">Coche les séances terminées dans ton planning. StudyPilot calcule automatiquement ta progression.</p><div class="progress-grid"><div class="progress-card"><strong id="progressPercent">0 %</strong><span>progression globale</span><div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div></div><div class="progress-card"><strong id="progressDone">0 / 0</strong><span>séances terminées</span></div><div class="progress-card"><strong id="progressHours">0 h</strong><span>temps étudié</span></div></div><div class="subject-progress" id="subjectProgress"><div class="empty">Génère un planning pour voir ta progression par matière.</div></div><p class="progress-note">Les séances cochées et le planning sont sauvegardés sur cet appareil.</p></section>
+<div class="notice">💡 <strong>À savoir :</strong> prototype local. Les réglages peuvent être sauvegardés sur cet appareil. Les données ne sont pas encore synchronisées entre appareils. Vérifie toujours que le planning correspond à tes vrais horaires.</div></main><footer>StudyPilot — prototype local de planification scolaire</footer>
+<script>
+const DAYS=["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
+const $=id=>document.getElementById(id);let subjects=[],classes=[],availability={},plan=[],view="week",doneIds=new Set();
+const uid=()=>Math.random().toString(36).slice(2,10);
+function initAvailability(){DAYS.forEach((d,i)=>availability[i]={enabled:i<5,start:i<5?"17:00":"09:00",end:i<5?"20:00":"12:00"});}
+initAvailability();
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function addSubject(data={}){subjects.push({id:uid(),name:data.name||"",difficulty:Number(data.difficulty)||3,exam:data.exam||"",goal:data.goal||"14"});renderSubjects();}
+function renderSubjects(){$("subjects").innerHTML=subjects.map(s=>`<div class="subject-item" data-id="${s.id}"><div class="subject-head"><strong>${esc(s.name||"Nouvelle matière")}</strong><button class="danger" data-remove-subject="${s.id}">Supprimer</button></div><div class="subject-fields"><div><label>Nom</label><input data-s="name" value="${esc(s.name)}" placeholder="Ex. Mathématiques"></div><div><label>Difficulté (1–5)</label><select data-s="difficulty">${[1,2,3,4,5].map(n=>`<option value="${n}" ${n===Number(s.difficulty)?"selected":""}>${n}</option>`).join("")}</select></div><div><label>Date d’examen</label><input data-s="exam" type="date" value="${esc(s.exam)}"></div><div><label>Note visée /20</label><input data-s="goal" type="number" min="0" max="20" step=".5" value="${esc(s.goal)}"></div></div></div>`).join("");}
+function renderAvailability(){$("availability").innerHTML=DAYS.map((d,i)=>{let a=availability[i];return `<div class="day"><h3><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-a="enabled" data-day="${i}" ${a.enabled?"checked":""} style="width:auto"> ${d}</label></h3><div class="day-times"><div><label>Début</label><input type="time" data-a="start" data-day="${i}" value="${a.start}" ${a.enabled?"":"disabled"}></div><div><label>Fin</label><input type="time" data-a="end" data-day="${i}" value="${a.end}" ${a.enabled?"":"disabled"}></div></div></div>`}).join("");}
+function addClass(data={}){classes.push({id:uid(),name:data.name||"",day:Number(data.day??0),start:data.start||"08:00",end:data.end||"09:30"});renderClasses();}
+function renderClasses(){$("classes").innerHTML=classes.map(c=>`<div class="class-item" data-id="${c.id}"><div class="class-fields"><div><label>Nom</label><input data-c="name" value="${esc(c.name)}" placeholder="Ex. Cours de maths"></div><div><label>Jour</label><select data-c="day">${DAYS.map((d,i)=>`<option value="${i}" ${i===Number(c.day)?"selected":""}>${d}</option>`).join("")}</select></div><div><label>Début</label><input data-c="start" type="time" value="${c.start}"></div><div><label>Fin</label><input data-c="end" type="time" value="${c.end}"></div></div><div class="actions"><button class="danger" data-remove-class="${c.id}">Supprimer cet engagement</button></div></div>`).join("");}
+function mins(t){if(!t||!t.includes(":"))return 0;let [h,m]=t.split(":").map(Number);return h*60+m;}
+function time(m){return `${String(Math.floor(m/60)).padStart(2,"0")}:${String(m%60).padStart(2,"0")}`;}
+function dayDiff(dateStr){if(!dateStr)return 999;let now=new Date();now.setHours(0,0,0,0);let d=new Date(dateStr+"T00:00:00");return Math.ceil((d-now)/86400000);}
+function generate(){
+ const validSubjects=subjects.filter(s=>s.name.trim());if(!validSubjects.length){$("message").textContent="Ajoute au moins une matière avec un nom avant de générer le planning.";return;}
+ const duration=Number($("minutes").value),maxSessions=Number($("maxSessions").value);let newPlan=[],warnings=[];
+ for(let d=0;d<7;d++){
+  const a=availability[d];if(!a.enabled)continue;let start=mins(a.start),end=mins(a.end);if(end<=start){warnings.push(DAYS[d]+": plage horaire invalide");continue;}
+  let busy=classes.filter(c=>Number(c.day)===d&&mins(c.end)>mins(c.start)).map(c=>[mins(c.start),mins(c.end)]);
+  let slots=[];for(let t=start;t+duration<=end;t+=duration+15){let conflict=busy.some(([b,e])=>t<e&&t+duration>b);if(!conflict)slots.push({start:t,end:t+duration});}
+  let count=Math.min(maxSessions,slots.length);for(let j=0;j<count;j++){newPlan.push({id:uid(),day:d,start:slots[j].start,end:slots[j].end,subject:null});}
+ }
+ if(!newPlan.length){$("message").textContent="Aucune séance possible. Vérifie tes disponibilités, la durée et les cours fixes.";return;}
+ // Give higher-priority subjects more sessions, using difficulty, exam proximity and target grade.
+ const weighted=validSubjects.map(s=>{let due=dayDiff(s.exam);let examBoost=due<0?0.6:due<=7?2.5:due<=21?1.7:due<=45?1.3:1;let goalBoost=1+Math.max(0,Number(s.goal||14)-10)/20;return {...s,weight:(Number(s.difficulty)||3)*examBoost*goalBoost,assigned:0};});
+ newPlan.sort((a,b)=>a.day-b.day||a.start-b.start);
+ newPlan.forEach((slot,i)=>{let pick=weighted.slice().sort((a,b)=>{let sa=a.weight/(1+a.assigned),sb=b.weight/(1+b.assigned);return sb-sa;})[0];slot.subject=pick.id;pick.assigned++;});
+ plan=newPlan;doneIds=new Set();renderPlan();$("message").textContent=`Planning créé : ${plan.length} séance(s) sur ${new Set(plan.map(p=>p.day)).size} jour(s). Tu peux ajuster tes réglages puis le générer à nouveau.`;
+}
+function renderProgress(){
+ const total=plan.length,done=[...doneIds].filter(id=>plan.some(p=>p.id===id));
+ const pct=total?Math.round(done.length/total*100):0;
+ const studied=done.reduce((sum,id)=>{const p=plan.find(x=>x.id===id);return sum+(p?(p.end-p.start):0)},0)/60;
+ $("progressPercent").textContent=pct+" %";$("progressFill").style.width=pct+"%";$("progressDone").textContent=done.length+" / "+total;$("progressHours").textContent=studied.toFixed(1)+" h";
+ if(!total){$("subjectProgress").innerHTML='<div class="empty">Génère un planning pour voir ta progression par matière.</div>';return;}
+ const rows=subjects.filter(s=>plan.some(p=>p.subject===s.id)).map(s=>{const all=plan.filter(p=>p.subject===s.id),finished=all.filter(p=>doneIds.has(p.id)).length,pc=Math.round(finished/all.length*100);return `<div class="subject-progress-row"><div class="name">${esc(s.name||"Matière")}</div><div class="progress-bar"><div class="progress-fill" style="width:${pc}%"></div></div><strong>${pc}%</strong></div>`});
+ $("subjectProgress").innerHTML=rows.join("");
+}
+function renderPlan(){
+ $("statSessions").textContent=plan.length;$("statHours").textContent=(plan.reduce((sum,p)=>sum+(p.end-p.start),0)/60).toFixed(1)+" h";$("statDone").textContent=doneIds.size;
+ document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.view===view));
+ const days=view==="day"?[plan.length?plan[0].day:0]:[...new Set(plan.map(p=>p.day))];
+ if(!plan.length){$("plan").innerHTML='<div class="empty">Aucun planning pour le moment. Remplis les informations et génère ton planning.</div>';renderProgress();return;}
+ $("plan").innerHTML=days.map(d=>{let items=plan.filter(p=>p.day===d);return `<div class="day-plan"><div class="day-title"><span>${DAYS[d]}</span><span>${items.length} séance(s)</span></div>${items.map(p=>{let s=subjects.find(s=>s.id===p.subject)||{name:"Matière"};let isDone=doneIds.has(p.id);return `<div class="session ${isDone?"done":""}"><time>${time(p.start)}–${time(p.end)}</time><div><div class="task-name"><strong>${esc(s.name)}</strong></div><small>Difficulté : ${s.difficulty}/5 · Objectif : ${esc(s.goal)}/20${s.exam?" · Examen : "+esc(s.exam):""}</small></div><input class="check" type="checkbox" aria-label="Séance terminée" data-done="${p.id}" ${isDone?"checked":""}></div>`}).join("")}</div>`}).join("");
+ renderProgress();
+}
+function snapshot(){return {subjects,classes,availability,minutes:$("minutes").value,maxSessions:$("maxSessions").value,plan,doneIds:[...doneIds]};}
+function save(){try{localStorage.setItem("studypilot-data",JSON.stringify(snapshot()));$("message").textContent="Réglages sauvegardés sur cet appareil."; }catch(e){$("message").textContent="Impossible de sauvegarder dans ce navigateur. Tu peux tout de même utiliser l’application."}}
+function load(){try{let raw=localStorage.getItem("studypilot-data");if(!raw)return false;let x=JSON.parse(raw);subjects=x.subjects||[];classes=x.classes||[];availability=x.availability||availability;plan=x.plan||[];doneIds=new Set(x.doneIds||[]);$("minutes").value=x.minutes||"45";$("maxSessions").value=x.maxSessions||"3";renderSubjects();renderClasses();renderAvailability();renderPlan();return true;}catch(e){return false;}}
+$("addSubject").addEventListener("click",()=>addSubject());$("addClass").addEventListener("click",()=>addClass());$("generate").addEventListener("click",generate);$("save").addEventListener("click",save);
+$("reset").addEventListener("click",()=>{if(confirm("Effacer les réglages sauvegardés et recommencer ?")){localStorage.removeItem("studypilot-data");subjects=[];classes=[];availability={};initAvailability();plan=[];doneIds.clear();renderSubjects();renderClasses();renderAvailability();renderPlan();$("message").textContent="Réinitialisé.";addSubject({name:"Mathématiques",difficulty:4,goal:14});addSubject({name:"Anglais",difficulty:3,goal:15});}});
+document.addEventListener("input",e=>{let el=e.target,card=el.closest(".subject-item");if(card&&el.dataset.s){let s=subjects.find(x=>x.id===card.dataset.id);if(s){s[el.dataset.s]=el.value;if(el.dataset.s==="name")card.querySelector(".subject-head strong").textContent=el.value||"Nouvelle matière";}}let cc=el.closest(".class-item");if(cc&&el.dataset.c){let c=classes.find(x=>x.id===cc.dataset.id);if(c)c[el.dataset.c]=el.value;}if(el.dataset.a){let a=availability[el.dataset.day];a[el.dataset.a]=el.type==="checkbox"?el.checked:el.value;if(el.dataset.a==="enabled")renderAvailability();}});
+document.addEventListener("change",e=>{let el=e.target;if(el.dataset.s||el.dataset.c||el.dataset.a){/* values handled in input */}if(el.dataset.done){if(el.checked)doneIds.add(el.dataset.done);else doneIds.delete(el.dataset.done);renderPlan();save();}});
+document.addEventListener("click",e=>{let b=e.target.closest("[data-remove-subject]");if(b){subjects=subjects.filter(s=>s.id!==b.dataset.removeSubject);renderSubjects();}let c=e.target.closest("[data-remove-class]");if(c){classes=classes.filter(s=>s.id!==c.dataset.removeClass);renderClasses();}let tab=e.target.closest("[data-view]");if(tab){view=tab.dataset.view;renderPlan();}});
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{view=b.dataset.view;renderPlan();}));
+if(!load()){addSubject({name:"Mathématiques",difficulty:4,goal:14});addSubject({name:"Anglais",difficulty:3,goal:15});addSubject({name:"Comptabilité",difficulty:5,goal:13});renderAvailability();addClass({name:"Cours du matin",day:0,start:"08:00",end:"12:00"});}
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+</script>
+</body></html>

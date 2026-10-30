@@ -1,0 +1,5 @@
+STUDYPILOT — VERSION 3
+
+Ajout du suivi de progression : séances terminées, pourcentage global, temps étudié et progression par matière.
+
+Ouvre index.html dans ton navigateur.
